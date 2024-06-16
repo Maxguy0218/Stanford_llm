@@ -1,17 +1,17 @@
+import os
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-import os
 from langchain import PromptTemplate
 from langchain.chains.question_answering import load_qa_chain
-from langchain.document_loaders import PyPDFDirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
 
-# Load the environment variables
-load_dotenv()
+# Configure the Google Generative AI
+import google.generativeai as genai
+genai.configure(api_key='AIzaSyCbyn2VMNwy02PerTQFWyTBcPoD2N4ZJsc')
 
 # Streamlit app title
 st.title("Stanford LLM Content Retriever")
@@ -86,7 +86,3 @@ if question:
 # Display the entire context for reference (optional)
 with st.expander("Show context"):
     st.write(context)
-
-# Install necessary packages (comment out in Streamlit app)
-# !pip install -q --upgrade google-generativeai langchain-google-genai python-dotenv
-# !pip install langchain pypdf chromadb langchain-community
