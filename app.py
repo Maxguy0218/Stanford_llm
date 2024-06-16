@@ -6,12 +6,21 @@ from dotenv import load_dotenv
 from langchain import PromptTemplate
 from langchain.chains.question_answering import load_qa_chain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Chroma
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+
+# Load environment variables
+load_dotenv()
+
+# Retrieve the API key from the environment variables
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+
+# Check if the API key is loaded
+if not GOOGLE_API_KEY:
+    st.error("API key not found. Please ensure it is set in the .env file.")
+    st.stop()
 
 # Configure the Google Generative AI
 import google.generativeai as genai
-genai.configure(api_key='AIzaSyCbyn2VMNwy02PerTQFWyTBcPoD2N4ZJsc')
+genai.configure(api_key=GOOGLE_API_KEY)
 
 # Streamlit app title
 st.title("Stanford LLM Content Retriever")
@@ -53,8 +62,15 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=2
 texts = text_splitter.split_text(context)
 
 # Initialize embeddings and vector index
-embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-vector_index = Chroma.from_texts(texts, embeddings).as_retriever()
+try:
+    from langchain.vectorstores import Chroma
+    from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
+    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+    vector_index = Chroma.from_texts(texts, embeddings).as_retriever()
+except ModuleNotFoundError:
+    st.error("Chroma module not found. Please ensure that 'chromadb' is installed and the correct import path is used.")
+    st.stop()
 
 # Create a prompt template
 prompt_template = """
@@ -67,6 +83,7 @@ prompt_template = """
 prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
 
 # Create a language model chain
+from langchain_google_genai import ChatGoogleGenerativeAI
 model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
 chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
 
