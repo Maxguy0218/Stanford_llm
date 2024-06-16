@@ -7,23 +7,20 @@ from langchain import PromptTemplate
 from langchain.chains.question_answering import load_qa_chain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-# Load environment variables
-load_dotenv()
+# Streamlit app title
+st.title("Stanford LLM Content Retriever")
 
-# Retrieve the API key from the environment variables
-GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+# Ask the user for the Google Generative AI key
+GOOGLE_API_KEY = st.text_input("Enter your Google Generative AI key:", type="password")
 
-# Check if the API key is loaded
+# Check if the API key is provided
 if not GOOGLE_API_KEY:
-    st.error("API key not found. Please ensure it is set in the .env file.")
+    st.warning("Please enter your Google Generative AI key.")
     st.stop()
 
 # Configure the Google Generative AI
 import google.generativeai as genai
 genai.configure(api_key=GOOGLE_API_KEY)
-
-# Streamlit app title
-st.title("Stanford LLM Content Retriever")
 
 # Fetch and clean content from URLs
 lecture_urls = [
