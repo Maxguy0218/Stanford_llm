@@ -1,0 +1,9 @@
+streamlit
+requests
+beautifulsoup4
+python-dotenv
+langchain
+pypdf
+chromadb
+langchain-google-genai
+google-generativeai
